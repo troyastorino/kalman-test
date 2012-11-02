@@ -15,13 +15,15 @@
     (dosync
      (ref-set state [xr yr theta xl yl]))))
 
-(def Q (matrix [[1e-3 0 0 0 0] 
-                [0 1e-3 0 0 0]
-                [0 0 1e-4 0 0]
-                [0 0 0 1e-3 0]
-                [0 0 0 0 1e-3]])) ; Cov in executing commands
-(def R (matrix [[100 0]
-                [0 50]])) ; Cov in measurment
+(def R (let [eps 1e-3]
+        (matrix [[eps 0 0 0 0] 
+                 [0 eps 0 0 0]
+                 [0 0 eps 0 0]
+                 [0 0 0 eps 0]
+                 [0 0 0 0 eps]])))     ; Cov in executing commands
+
+(def Q (matrix [[10 0]
+                [0 0.5]])) ; Cov in measurment
 
 (defn wrap-angle [theta]
   (if (> theta Math/PI)
@@ -115,7 +117,7 @@
   "Runs the simulation, outputs a graph when the trace of the
   covariance matrix is small enough."
   [& arg]
-  (run-simulation! model-g h G H Q R [(/ size 2) (/ size 2) 0 0 0] (matrix [[size 0 0 0 0]
+  (run-simulation! model-g h G H R Q [(/ size 2) (/ size 2) 0 0 0] (matrix [[size 0 0 0 0]
                                                                             [0 size 0 0 0]
                                                                             [0 0 Math/PI 0 0]
                                                                             [0 0 0 size 0]
